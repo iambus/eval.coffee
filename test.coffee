@@ -33,7 +33,10 @@ check_eval = (expected, code, context) ->
 assert_eval = (expected, code, context) ->
 	result = check_eval expected, code, context
 	if not result.ok
-		console.error result.message
+		if result.message.stack
+			console.error result.message.stack
+		else
+			console.error result.message
 
 op = new Op()
 i = new Int()
@@ -48,4 +51,8 @@ assert_eval int(), "int()", int: int
 assert_eval int(2), "int(2)", int: int
 assert_eval new Int().inc(), "i.inc()", i: new Int()
 assert_eval op.add(1, 2), "op.add(1, 2)", op: op
+
+assert_eval true, "/x/i.test 'x'"
+assert_eval true, "/x/i.test 'X'"
+assert_eval false, "/x/i.test 'a'"
 

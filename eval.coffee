@@ -78,10 +78,13 @@ eval_literal = (node, context) ->
 		context[value]
 	else if value.match /^\d+$/
 		parseInt value
-	else if value.match /\d+\.\d+/
+	else if value.match /^\d+\.\d+$/
 		parseFloat value
-	else if value.match /['"].*['"]/
+	else if value.match /^['"].*['"]$/
 		unescape_string value.substring 1, value.length - 1
+	else if value.match /^\/(.*)\/(\w+)$/
+		m = value.match /^\/(.*)\/(\w+)/
+		return new RegExp m[1], m[2]
 	else
 		throw Error("Not Implemented: #{value}")
 
