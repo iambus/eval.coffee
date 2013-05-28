@@ -84,3 +84,10 @@ assert_eval [1, 2, 3], '[1, 2, 3]'
 assert_eval a: 1, b: 2, 'a: 1, b: 2'
 assert_eval id(a: 1, b: 2), 'id a: 1, "b": 2', id: id
 
+assert_eval 1 + 1, '1 + 1'
+assert_eval 1 - 1, '1 - 1'
+assert_eval 1 * 1, '1 * 1'
+assert_eval 1 / 1, '1 / 1'
+assert_eval 1 % 1, '1 % 1'
+assert_eval 1 + 2 * 3 / 4 % 5, '1 + 2 * 3 / 4 % 5'
+

@@ -112,6 +112,19 @@ eval_dict = (node, context) ->
 		result[k] = v
 	return result
 
+eval_op = (node, context) ->
+	if node.operator == '+'
+		return eval_tree(node.first, context) + eval_tree(node.second, context)
+	if node.operator == '-'
+		return eval_tree(node.first, context) - eval_tree(node.second, context)
+	if node.operator == '*'
+		return eval_tree(node.first, context) * eval_tree(node.second, context)
+	if node.operator == '/'
+		return eval_tree(node.first, context) / eval_tree(node.second, context)
+	if node.operator == '%'
+		return eval_tree(node.first, context) % eval_tree(node.second, context)
+	throw new Error("Not Implemented: #{node.operator}")
+
 eval_expr = (node, context) ->
 	throw Error("Not Implemented: #{node}")
 
@@ -128,6 +141,8 @@ eval_tree = (node, globals) ->
 		eval_array node, globals
 	else if node instanceof nodes.Obj
 		eval_dict node, globals
+	else if node instanceof nodes.Op
+		eval_op node, globals
 	else
 #		console.error node
 #		console.error node.constructor
