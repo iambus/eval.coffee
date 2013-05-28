@@ -88,6 +88,30 @@ eval_literal = (node, context) ->
 	else
 		throw Error("Not Implemented: #{value}")
 
+eval_array = (node, context) ->
+	result = []
+	for e in node.objects
+		result.push eval_tree e, context
+	return result
+
+eval_dict = (node, context) ->
+	if not node.generated
+		throw new Error("Assert Error: node.generated")
+	result = {}
+	for property in node.properties
+		if not property instanceof nodes.Assign
+			throw new Error("Assert Error: property instanceof nodes.Assign")
+		{variable, value} = property
+		k = variable.base.value
+		if not k.match /^\w+$/
+			if k.match /^['"].*['"]$/
+				k = unescape_string k.substring 1, k.length - 1
+			else
+				throw new Error("Not Implemented: #{k}")
+		v = eval_tree value, context
+		result[k] = v
+	return result
+
 eval_expr = (node, context) ->
 	throw Error("Not Implemented: #{node}")
 
@@ -100,6 +124,10 @@ eval_tree = (node, globals) ->
 		eval_value node, globals
 	else if node instanceof nodes.Literal
 		eval_literal node, globals
+	else if node instanceof nodes.Arr
+		eval_array node, globals
+	else if node instanceof nodes.Obj
+		eval_dict node, globals
 	else
 #		console.error node
 #		console.error node.constructor

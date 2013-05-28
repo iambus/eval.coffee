@@ -1,5 +1,42 @@
 
 eval_coffee = require './eval'
+_ = require 'underscore'
+
+##################################################
+# test utilities
+##################################################
+
+eq = (x, y) ->
+	_.isEqual x, y
+
+repr = (x) ->
+	try
+		return JSON.stringify x
+	catch error
+		return x
+
+check_eval = (expected, code, context) ->
+	try
+		result = eval_coffee code, context
+	catch error
+		return ok: false, message: error
+	if not eq expected, result
+		return ok: false, message: "Expected: #{repr expected}, actual: #{repr result}, by\n#{code}"
+	return ok: true
+
+assert_eval = (expected, code, context) ->
+	result = check_eval expected, code, context
+	if not result.ok
+		if result.message.stack
+			console.error result.message.stack
+		else
+			console.error result.message
+
+##################################################
+# test environment
+##################################################
+
+id = (x) -> x
 
 class Op
 	add: (x, y) ->
@@ -21,25 +58,12 @@ inc = (x) ->
 add = (x, y) ->
 	x + y
 
-check_eval = (expected, code, context) ->
-	try
-		result = eval_coffee code, context
-	catch error
-		return ok: false, message: error
-	if expected != result
-		return ok: false, message: "Expected: #{expected}, actual: #{result}, by\n#{code}"
-	return ok: true
-
-assert_eval = (expected, code, context) ->
-	result = check_eval expected, code, context
-	if not result.ok
-		if result.message.stack
-			console.error result.message.stack
-		else
-			console.error result.message
-
 op = new Op()
 i = new Int()
+
+##################################################
+# test cases
+##################################################
 
 assert_eval 1, "1"
 assert_eval '1', "'1'"
@@ -55,4 +79,8 @@ assert_eval op.add(1, 2), "op.add(1, 2)", op: op
 assert_eval true, "/x/i.test 'x'"
 assert_eval true, "/x/i.test 'X'"
 assert_eval false, "/x/i.test 'a'"
+
+assert_eval [1, 2, 3], '[1, 2, 3]'
+assert_eval a: 1, b: 2, 'a: 1, b: 2'
+assert_eval id(a: 1, b: 2), 'id a: 1, "b": 2', id: id
 
